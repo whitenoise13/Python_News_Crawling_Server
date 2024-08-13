@@ -11,13 +11,12 @@ from urllib.parse import urljoin
 def fetch_news_with_selenium(url):
     # Selenium을 설정
     options = Options()
-    options.add_argument('--headless')  # 브라우저를 화면에 표시하지 않음
+    options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
     # ChromeDriver를 설정
-    driver = webdriver.Chrome(service=Service('/Users/dgsw8th74/.wdm/drivers/chromedriver/mac64/127.0.6533.72/chromedriver-mac-arm64/chromedriver'), options=options)
-
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     # URL로 웹 페이지를 연다
     driver.get(url)
@@ -31,14 +30,13 @@ def fetch_news_with_selenium(url):
 
     return html
 
-
 def news_by_category(request, category):
     category_urls = {
-        'securities': 'https://news.naver.com/breakingnews/section/101/258',  # 증권
-        'finance': 'https://news.naver.com/breakingnews/section/101/259',  # 금융
-        'economy': 'https://news.naver.com/breakingnews/section/101/263',  # 경제
-        'realEstate': 'https://news.naver.com/breakingnews/section/101/260',  # 부동산
-        'industrialBusiness': 'https://news.naver.com/breakingnews/section/101/261'  # 산업/재계
+        'securities': 'https://news.naver.com/breakingnews/section/101/258',
+        'finance': 'https://news.naver.com/breakingnews/section/101/259',
+        'economy': 'https://news.naver.com/breakingnews/section/101/263',
+        'realEstate': 'https://news.naver.com/breakingnews/section/101/260',
+        'industrialBusiness': 'https://news.naver.com/breakingnews/section/101/261'
     }
 
     url = category_urls.get(category)
@@ -55,17 +53,14 @@ def news_by_category(request, category):
 
         news_items = []
         for item_div in news_items_divs:
-            # 제목 및 URL 추출
             title_tag = item_div.select_one("a.sa_text_title")
             title = title_tag.select_one("strong.sa_text_strong").text.strip() if title_tag else None
             relative_url = title_tag.get('href') if title_tag else None
             absolute_url = urljoin(url, relative_url) if relative_url else None
 
-            # 언론사 추출
             company_tag = item_div.select_one("div.sa_text_press")
             company = company_tag.text.strip() if company_tag else None
 
-            # 썸네일 이미지 URL 추출
             thumbnail_tag = item_div.select_one("div.sa_thumb img")
             thumbnail_url = thumbnail_tag['src'] if thumbnail_tag and 'src' in thumbnail_tag.attrs else None
 
