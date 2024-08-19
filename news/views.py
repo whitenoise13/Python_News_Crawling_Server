@@ -6,7 +6,43 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
 from urllib.parse import urljoin
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view
+from drf_yasg import openapi
 
+
+@swagger_auto_schema(
+    operation_description="카테고리에 따라 뉴스 항목을 웹 스크래핑하여 가져옵니다.",
+    manual_parameters=[
+        openapi.Parameter(
+            'category',
+            in_=openapi.IN_PATH,
+            description='뉴스 카테고리',
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="뉴스 항목 리스트",
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'title': openapi.Schema(type=openapi.TYPE_STRING, description='뉴스 제목'),
+                        'url': openapi.Schema(type=openapi.TYPE_STRING, description='뉴스 URL'),
+                        'company': openapi.Schema(type=openapi.TYPE_STRING, description='뉴스 제공 회사'),
+                        'thumbnail': openapi.Schema(type=openapi.TYPE_STRING, description='썸네일 이미지 URL')
+                    }
+                )
+            )
+        ),
+        404: openapi.Response(description="존재하지 않는 카테고리입니다."),
+        500: openapi.Response(description="뉴스를 가져오는 데 실패했습니다.")
+    },
+    tags=['뉴스 스크래핑']
+)
 
 def fetch_news_with_selenium(url):
     # Selenium을 설정
@@ -30,6 +66,7 @@ def fetch_news_with_selenium(url):
 
     return html
 
+@api_view(['GET'])
 def news_by_category(request, category):
     category_urls = {
         'securities': 'https://news.naver.com/breakingnews/section/101/258',
@@ -75,3 +112,8 @@ def news_by_category(request, category):
 
     except Exception as e:
         return JsonResponse({"error": "뉴스를 가져오는 데 실패했습니다.", "details": str(e)}, status=500)
+
+# # REST API를 위한 ViewSet
+# class NewsViewSet(viewsets.ModelViewSet):
+#     queryset = News.objects.all()
+#     serializer_class = NewsSerializer
