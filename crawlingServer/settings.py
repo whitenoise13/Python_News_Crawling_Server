@@ -54,12 +54,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-]
+CORS_ALLOW_ALL_ORIGINS = True # 모든 접속 허용
 
 CORS_ALLOW_HEADERS = [
     'content-type',
@@ -67,7 +62,8 @@ CORS_ALLOW_HEADERS = [
     'X-Requested-With',
     'Authorization',
 ]
-CORS_ALLOW_METHODS = [
+
+CORS_ALLOW_METHODS = [ # 모든 요청 허용
     'GET',
     'POST',
     'PUT',
@@ -75,7 +71,6 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS',
 ]
-
 
 ROOT_URLCONF = 'crawlingServer.urls'
 
