@@ -79,7 +79,9 @@ def news_by_category(request, category):
 
     url = category_urls.get(category)
     if not url:
-        return JsonResponse({"error": "존재하지 않는 카테고리입니다."}, status=404)
+        response = JsonResponse({"error": "존재하지 않는 카테고리입니다."}, status=404)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     try:
         # Selenium을 사용하여 페이지를 로드하고 HTML을 가져옴
