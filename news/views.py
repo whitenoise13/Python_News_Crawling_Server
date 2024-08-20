@@ -69,6 +69,7 @@ def fetch_news_with_selenium(url):
 @api_view(['GET'])
 def news_by_category(request, category):
     category_urls = {
+        'main': 'https://news.naver.com/breakingnews/section/101/263',
         'securities': 'https://news.naver.com/breakingnews/section/101/258',
         'finance': 'https://news.naver.com/breakingnews/section/101/259',
         'economy': 'https://news.naver.com/breakingnews/section/101/263',
@@ -108,12 +109,11 @@ def news_by_category(request, category):
                 'thumbnail': thumbnail_url
             })
 
-        return JsonResponse(news_items, safe=False)
+        response = JsonResponse(news_items, safe=False)
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
 
     except Exception as e:
-        return JsonResponse({"error": "뉴스를 가져오는 데 실패했습니다.", "details": str(e)}, status=500)
-
-# # REST API를 위한 ViewSet
-# class NewsViewSet(viewsets.ModelViewSet):
-#     queryset = News.objects.all()
-#     serializer_class = NewsSerializer
+        response = JsonResponse({"error": "뉴스를 가져오는 데 실패했습니다.", "details": str(e)}, status=500)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
